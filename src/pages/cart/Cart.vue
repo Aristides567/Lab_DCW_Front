@@ -86,48 +86,48 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
         <!-- Lista de Items -->
         <div class="lg:col-span-2">
           <ul class="space-y-4">
-            <li v-for="item in cartState.items" :key="item.servicioId?._id || item._id"
+            <li v-for="item in cartState.items" :key="item.servicioId._id"
               class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 relative"
-              @mouseover="showTechnologiesHover(item.servicioId?._id)" @mouseleave="hideTechnologiesHover()">
+              @mouseover="showTechnologiesHover(item.servicioId._id)" @mouseleave="hideTechnologiesHover()">
               <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex-shrink-0">
-                  <img v-if="item.servicioId?.imagen" :src="'https://lab-dcw-back.onrender.com' + item.servicioId.imagen"
-                    :alt="item.servicioId?.nombre || 'Servicio'" class="w-32 h-32 object-cover rounded-lg border border-gray-200" />
+                  <img v-if="item.servicioId.imagen" :src="'https://lab-dcw-back.onrender.com' + item.servicioId.imagen"
+                    :alt="item.servicioId.nombre" class="w-32 h-32 object-cover rounded-lg border border-gray-200" />
                 </div>
-                <div class="flex-1">
-                  <h3 class="font-bold text-xl text-violet-700 mb-2">{{ item.servicioId?.nombre || 'Servicio no disponible' }}</h3>
-                  <p class="text-gray-600 mb-4">{{ item.servicioId?.descripcion?.substring(0, 100) + '...' || 'Sin descripción' }}</p>
-                  
-                  <!-- Tecnologías seleccionadas -->
-                  <div v-if="item.tecnologiasSeleccionadas && item.tecnologiasSeleccionadas.length" class="mb-4">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Tecnologías seleccionadas:</h4>
-                    <ul class="space-y-1">
-                      <li v-for="tech in item.tecnologiasSeleccionadas" :key="tech?._id"
-                          class="text-sm text-gray-600 flex items-center gap-2">
-                        <span class="w-2 h-2 bg-violet-500 rounded-full"></span>
-                        {{ tech?.name || 'Tecnología' }} (+${{ tech?.price || 0 }})
-                      </li>
-                    </ul>
+                <div class="flex-grow">
+                  <h3 class="font-bold text-xl text-violet-700 mb-2">{{ item.servicioId.nombre }}</h3>
+                  <p class="text-gray-600 mb-4">{{ item.servicioId.descripcion.substring(0, 100) + '...' }}</p>
+
+                  <!-- Tecnologías Hover -->
+                  <div
+                    v-if="hoveredServiceId === item.servicioId._id && item.tecnologiasSeleccionadas && item.tecnologiasSeleccionadas.length"
+                    class="absolute top-0 left-0 p-4 bg-white rounded-lg shadow-lg border border-violet-200 z-10 w-64 animate-fade-in-scale transform -translate-x-full origin-top-right">
+                    <h4 class="text-sm font-semibold text-violet-700 mb-2">Tecnologías:</h4>
+                    <div class="flex flex-wrap gap-2">
+                      <img v-for="tech in item.tecnologiasSeleccionadas" :key="tech._id"
+                        :src="getTechnologyImageUrl(tech.image)" :alt="tech.name"
+                        class="h-10 w-10 object-cover rounded-full border border-gray-200" :title="tech.name" />
+                    </div>
                   </div>
 
                   <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
                       <label for="cantidad" class="text-gray-600 font-medium">Cantidad:</label>
                       <div class="flex items-center border rounded-lg overflow-hidden">
-                        <button @click="actualizarCantidadEnCarrito(item.servicioId?._id, item.cantidad - 1)"
+                        <button @click="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad - 1)"
                           class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors">-</button>
                         <input type="number" v-model.number="item.cantidad"
-                          @change="actualizarCantidadEnCarrito(item.servicioId?._id, item.cantidad)" min="1"
+                          @change="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad)" min="1"
                           class="w-16 p-2 text-center focus:outline-none" />
-                        <button @click="actualizarCantidadEnCarrito(item.servicioId?._id, item.cantidad + 1)"
+                        <button @click="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad + 1)"
                           class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors">+</button>
                       </div>
                     </div>
                     <div class="text-right">
                       <p class="text-lg font-semibold text-violet-800">
-                        Subtotal: $ {{ (item.precioTotal || 0) * item.cantidad }}
+                        Subtotal: $ {{ item.precioTotal * item.cantidad }}
                       </p>
-                      <button @click="confirmarEliminar(item.servicioId?._id)"
+                      <button @click="confirmarEliminar(item.servicioId._id)"
                         class="text-red-500 hover:text-red-700 text-sm font-medium mt-2 transition-colors">
                         Eliminar
                       </button>
