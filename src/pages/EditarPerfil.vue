@@ -45,7 +45,7 @@ const guardarCambios = async () => {
       throw new Error('No hay sesión activa')
     }
 
-    const response = await fetch('https://tilinazos.netlify.app/api/usuarios/update-profile', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/usuarios/update-profile', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -22,7 +22,7 @@
                 <div class="flex-shrink-0">
                   <img
                     v-if="item.servicioId.imagen"
-                    :src="'http://localhost:5000' + item.servicioId.imagen"
+                    :src="'https://lab-dcw-back.onrender.com' + item.servicioId.imagen"
                     :alt="item.servicioId.nombre"
                     class="w-32 h-32 object-cover rounded-lg border border-gray-200" />
                 </div>

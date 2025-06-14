@@ -37,7 +37,7 @@ const resetearContrasena = async () => {
   }
 
   try {
-    const response = await fetch(`https://tilinazos.netlify.app/api/auth/resetpassword/${token.value}`, {
+    const response = await fetch(`https://lab-dcw-back.onrender.com/api/auth/resetpassword/${token.value}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

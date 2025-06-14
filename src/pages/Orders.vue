@@ -98,7 +98,7 @@ const error = ref(null)
 
 const fetchOrders = async () => {
   try {
-    const response = await fetch('https://tilinazos.netlify.app/api/ordenes', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/ordenes', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
