@@ -12,7 +12,7 @@
       <div class="flex-1 flex items-center justify-center">
         <img
           v-if="service.imagen"
-          :src="'https://tilinazos.netlify.app' + service.imagen"
+          :src="'https://lab-dcw-back.onrender.com' + service.imagen"
           :alt="service.nombre"
           class="max-h-full max-w-full object-contain rounded-lg shadow-lg border border-gray-100" />
       </div>
@@ -56,7 +56,7 @@
                 <div class="flex items-center gap-3">
                   <img
                     v-if="tech.image"
-                    :src="`https://tilinazos.netlify.app${tech.image}`"
+                    :src="`https://lab-dcw-back.onrender.com${tech.image}`"
                     :alt="tech.name"
                     class="h-8 w-8 object-cover rounded-full"
                   />

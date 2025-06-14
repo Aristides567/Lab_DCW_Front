@@ -27,7 +27,7 @@ const displayName = computed(() =>
 onMounted(async () => {
   try {
     const token = obtenerToken()
-    const response = await fetch('https://tilinazos.netlify.app/api/auth/me', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/auth/me', {
       headers: {
         'Authorization': `Bearer ${token}`
       }

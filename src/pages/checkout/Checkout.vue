@@ -56,7 +56,7 @@ const subtotal = computed(() => cartState.total)
 const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
 const total = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
 
-const getImageUrl = (path) => `https://tilinazos.netlify.app/${path}`
+const getImageUrl = (path) => `https://lab-dcw-back.onrender.com/${path}`
 
 const procesarCompra = async () => {
   if (!validarFechaExpiracion()) {
@@ -65,7 +65,7 @@ const procesarCompra = async () => {
   }
 
   try {
-    const response = await fetch('https://tilinazos.netlify.app/api/ordenes', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/ordenes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
