@@ -114,24 +114,24 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
               <div v-else-if="cartState.error" class="text-center py-4 text-red-500">Error al cargar resumen.</div>
 
               <ul v-else-if="cartState.items.length > 0" class="divide-y divide-gray-100 max-h-60 overflow-y-auto">
-                <li v-for="item in cartState.items" :key="item.servicioId?._id || item._id"
+                <li v-for="item in cartState.items" :key="item.servicioId._id"
                     class="px-4 py-3 flex justify-between items-start gap-3">
                   <div class="flex-1">
-                    <p class="text-gray-800 font-medium text-sm leading-tight">{{ item.servicioId?.nombre || 'Servicio no disponible' }}</p>
-                    <p class="text-gray-600 text-xs mt-1">Costo: $ {{ item.servicioId?.costo || 0 }}</p>
+                    <p class="text-gray-800 font-medium text-sm leading-tight">{{ item.servicioId.nombre }}</p>
+                    <p class="text-gray-600 text-xs mt-1">Costo: $ {{ item.servicioId.costo }}</p>
                     <div class="flex items-center mt-2">
                       <label class="text-gray-600 text-xs mr-2">Cantidad:</label>
                       <input type="number" :value="item.cantidad"
-                             @change="actualizarCantidadResumen(item.servicioId?._id, $event)"
+                             @change="actualizarCantidadResumen(item.servicioId._id, $event)"
                              min="1"
                              class="w-14 p-1 border border-gray-300 rounded-md text-center text-sm focus:outline-none focus:ring-1 focus:ring-violet-500" />
-                      <button @click="quitarItemResumen(item.servicioId?._id)"
+                      <button @click="quitarItemResumen(item.servicioId._id)"
                               class="ml-3 text-red-500 hover:text-red-700 text-sm">
                         Eliminar
                       </button>
                     </div>
                   </div>
-                  <p class="text-violet-700 font-semibold text-base">$ {{ (item.servicioId?.costo || 0) * item.cantidad }}</p>
+                  <p class="text-violet-700 font-semibold text-base">$ {{ item.servicioId.costo * item.cantidad }}</p>
                 </li>
               </ul>
 
