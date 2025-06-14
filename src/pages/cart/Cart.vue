@@ -49,6 +49,7 @@ const getTechnologyImageUrl = (imagePath) => {
   return `https://lab-dcw-back.onrender.com/${imagePath}`
 }
 
+// Corrección del cálculo
 const subtotal = computed(() => cartState.total)
 const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
 const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
@@ -82,9 +83,10 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
       </div>
 
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Lista de Items -->
         <div class="lg:col-span-2">
           <ul class="space-y-4">
-            <li v-for="item in cartState.items.filter(i => i?.servicioId && i.servicioId._id)" :key="item.servicioId._id"
+            <li v-for="item in cartState.items" :key="item.servicioId._id"
               class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 relative"
               @mouseover="showTechnologiesHover(item.servicioId._id)" @mouseleave="hideTechnologiesHover()">
               <div class="flex flex-col md:flex-row gap-6">
@@ -96,7 +98,9 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
                   <h3 class="font-bold text-xl text-violet-700 mb-2">{{ item.servicioId.nombre }}</h3>
                   <p class="text-gray-600 mb-4">{{ item.servicioId.descripcion.substring(0, 100) + '...' }}</p>
 
-                  <div v-if="hoveredServiceId === item.servicioId._id && item.tecnologiasSeleccionadas?.length"
+                  <!-- Tecnologías Hover -->
+                  <div
+                    v-if="hoveredServiceId === item.servicioId._id && item.tecnologiasSeleccionadas && item.tecnologiasSeleccionadas.length"
                     class="absolute top-0 left-0 p-4 bg-white rounded-lg shadow-lg border border-violet-200 z-10 w-64 animate-fade-in-scale transform -translate-x-full origin-top-right">
                     <h4 class="text-sm font-semibold text-violet-700 mb-2">Tecnologías:</h4>
                     <div class="flex flex-wrap gap-2">
@@ -108,7 +112,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
 
                   <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                      <label class="text-gray-600 font-medium">Cantidad:</label>
+                      <label for="cantidad" class="text-gray-600 font-medium">Cantidad:</label>
                       <div class="flex items-center border rounded-lg overflow-hidden">
                         <button @click="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad - 1)"
                           class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors">-</button>
@@ -135,9 +139,11 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
           </ul>
         </div>
 
+        <!-- Resumen -->
         <div class="lg:col-span-1">
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
             <h2 class="text-xl font-bold text-gray-800 mb-6">Resumen del Pedido</h2>
+
             <div class="space-y-4 mb-6">
               <div class="flex justify-between text-gray-600">
                 <span>Subtotal</span>
@@ -152,10 +158,13 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
                 <span>$ {{ totalFinal }}</span>
               </div>
             </div>
-            <button @click="irAlCheckout"
+
+            <button
+              @click="irAlCheckout"
               class="w-full bg-violet-600 text-white py-3 rounded-lg hover:bg-violet-700 transition-colors duration-300 font-semibold mb-4">
               Proceder al Pago
             </button>
+
             <RouterLink to="/servicios" class="block text-center text-violet-600 hover:text-violet-700 font-medium">
               Continuar Comprando
             </RouterLink>
@@ -172,7 +181,13 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
   animation: fade-in-scale 0.2s ease-out;
 }
 @keyframes fade-in-scale {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>

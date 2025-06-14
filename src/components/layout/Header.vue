@@ -14,6 +14,7 @@ let mouseLeaveTimeout = null
 const usuario = computed(() => obtenerUsuario())
 
 const rutas = ['/', '/servicios', '/sobre-nosotros']
+
 const clasesRuta = computed(() => {
   return rutas.reduce((acc, path) => {
     acc[path] = route.path === path
@@ -29,19 +30,28 @@ const logout = () => {
   mostrarMenu.value = false
 }
 
-const toggleMenu = () => mostrarMenu.value = !mostrarMenu.value
-const irAEditarPerfil = () => { router.push('/editar-perfil'); mostrarMenu.value = false }
-const irAMisCompras = () => { router.push('/mis-compras'); mostrarMenu.value = false }
+const toggleMenu = () => {
+  mostrarMenu.value = !mostrarMenu.value
+}
+
+const irAEditarPerfil = () => {
+  router.push('/editar-perfil')
+  mostrarMenu.value = false
+}
+
+const irAMisCompras = () => {
+  router.push('/mis-compras')
+  mostrarMenu.value = false
+}
 
 const actualizarCantidadResumen = async (servicioId, event) => {
   const nuevaCantidad = parseInt(event.target.value)
-  if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
-    await updateCartItem(servicioId, nuevaCantidad)
-  }
+  if (isNaN(nuevaCantidad) || nuevaCantidad < 1) return
+  await updateCartItem(servicioId, nuevaCantidad)
 }
 
 const quitarItemResumen = async (servicioId) => {
-  if (confirm('¿Eliminar este servicio del carrito?')) {
+  if (confirm('¿Estás seguro de que quieres eliminar este servicio del carrito?')) {
     await removeCartItem(servicioId)
   }
 }
@@ -57,8 +67,11 @@ const handleMouseLeaveCart = () => {
   }, 200)
 }
 
-onMounted(() => fetchCartData())
+onMounted(() => {
+  fetchCartData()
+})
 
+// Cálculos
 const subtotal = computed(() => cartState.total)
 const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
 const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
@@ -68,16 +81,19 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
   <header class="fixed w-full top-0 z-50 bg-white/90 shadow-md transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4">
       <nav class="flex justify-between items-center py-4">
+        <!-- Logo -->
         <RouterLink to="/" class="flex items-center text-violet-600 font-bold text-2xl hover:text-red-400">
           <img :src="logo" alt="Logo" class="mr-2 w-10 h-10" />
           <span>Novaweb Designers</span>
         </RouterLink>
 
+        <!-- Navegación -->
         <ul class="hidden md:flex space-x-8 items-center">
           <li><RouterLink to="/" :class="clasesRuta['/']">Inicio</RouterLink></li>
           <li><RouterLink to="/servicios" :class="clasesRuta['/servicios']">Servicios</RouterLink></li>
           <li><RouterLink to="/sobre-nosotros" :class="clasesRuta['/sobre-nosotros']">Sobre Nosotros</RouterLink></li>
 
+          <!-- Carrito -->
           <li v-if="usuario" class="relative h-full flex items-center" @mouseenter="handleMouseEnterCart" @mouseleave="handleMouseLeaveCart">
             <RouterLink to="/cart" class="text-gray-900 hover:text-violet-600 relative p-2 rounded-full hover:bg-gray-100">
               🛒 Carrito
@@ -87,24 +103,22 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
               </span>
             </RouterLink>
 
+            <!-- Resumen Carrito -->
             <div v-if="mostrarResumenCarrito" class="absolute right-0 top-full mt-0 w-80 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
               <div class="px-4 py-2 font-bold text-gray-800 border-b border-gray-200 flex justify-between items-center">
                 <span>Resumen del Carrito</span>
                 <span class="text-sm text-gray-500">({{ cartState.count }} artículos)</span>
               </div>
 
-              <div v-if="cartState.loading" class="text-center py-4 text-gray-500">Cargando...</div>
-              <div v-else-if="cartState.error" class="text-center py-4 text-red-500">Error al cargar.</div>
+              <div v-if="cartState.loading" class="text-center py-4 text-gray-500">Cargando resumen...</div>
+              <div v-else-if="cartState.error" class="text-center py-4 text-red-500">Error al cargar resumen.</div>
 
               <ul v-else-if="cartState.items.length > 0" class="divide-y divide-gray-100 max-h-60 overflow-y-auto">
-                <li
-                  v-for="item in cartState.items.filter(i => i?.servicioId && i.servicioId._id)"
-                  :key="item.servicioId._id"
-                  class="px-4 py-3 flex justify-between items-start gap-3"
-                >
+                <li v-for="item in cartState.items" :key="item.servicioId._id"
+                    class="px-4 py-3 flex justify-between items-start gap-3">
                   <div class="flex-1">
-                    <p class="text-gray-800 font-medium text-sm">{{ item.servicioId.nombre }}</p>
-                    <p class="text-gray-600 text-xs mt-1">Costo: ${{ item.servicioId.costo }}</p>
+                    <p class="text-gray-800 font-medium text-sm leading-tight">{{ item.servicioId.nombre }}</p>
+                    <p class="text-gray-600 text-xs mt-1">Costo: $ {{ item.servicioId.costo }}</p>
                     <div class="flex items-center mt-2">
                       <label class="text-gray-600 text-xs mr-2">Cantidad:</label>
                       <input type="number" :value="item.cantidad"
@@ -117,24 +131,25 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
                       </button>
                     </div>
                   </div>
-                  <p class="text-violet-700 font-semibold text-base">${{ item.servicioId.costo * item.cantidad }}</p>
+                  <p class="text-violet-700 font-semibold text-base">$ {{ item.servicioId.costo * item.cantidad }}</p>
                 </li>
               </ul>
 
               <div v-else class="text-center py-4 text-gray-500">Tu carrito está vacío.</div>
 
+              <!-- Subtotal, impuestos, total -->
               <div class="px-4 py-2 space-y-1 border-t border-gray-200 text-sm text-right">
                 <div class="flex justify-between">
                   <span class="text-gray-600">Subtotal:</span>
-                  <span class="text-gray-800 font-medium">${{ subtotal }}</span>
+                  <span class="text-gray-800 font-medium">$ {{ subtotal }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-600">Impuestos (13%):</span>
-                  <span class="text-gray-800 font-medium">${{ impuestos }}</span>
+                  <span class="text-gray-800 font-medium">$ {{ impuestos }}</span>
                 </div>
                 <div class="flex justify-between text-violet-800 text-base font-bold pt-1 border-t border-gray-200">
                   <span>Total:</span>
-                  <span>${{ totalFinal }}</span>
+                  <span>$ {{ totalFinal }}</span>
                 </div>
               </div>
 
@@ -147,6 +162,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
             </div>
           </li>
 
+          <!-- Login / Perfil -->
           <li v-if="!usuario">
             <RouterLink to="/login" class="text-white bg-violet-600 px-4 py-2 rounded-full hover:bg-red-500 transition">
               Iniciar Sesión
@@ -154,7 +170,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
           </li>
           <li v-else class="relative">
             <button @click="toggleMenu" class="flex items-center gap-2 text-gray-800 hover:text-violet-600 transition">
-              <span class="font-semibold">{{ usuario?.nombre ?? 'Usuario' }}</span>
+              <span class="font-semibold">{{ usuario.nombre }}</span>
               <span class="text-xl">▼</span>
             </button>
 
