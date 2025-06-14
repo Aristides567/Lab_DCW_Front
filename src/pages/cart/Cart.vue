@@ -44,9 +44,9 @@ const irAlCheckout = () => {
 
 const getTechnologyImageUrl = (imagePath) => {
   if (imagePath && !imagePath.startsWith('/uploads/technologies/')) {
-    return `http://localhost:5000/uploads/technologies/${imagePath.substring(imagePath.lastIndexOf('/') + 1)}`
+    return `https://lab-dcw-back.onrender.com/uploads/technologies/${imagePath.substring(imagePath.lastIndexOf('/') + 1)}`
   }
-  return `http://localhost:5000${imagePath}`
+  return `https://lab-dcw-back.onrender.com/${imagePath}`
 }
 
 // Corrección del cálculo

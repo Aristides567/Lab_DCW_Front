@@ -66,7 +66,7 @@ const enviarFormulario = async () => {
   error.value = ''
 
   try {
-    const response = await fetch('http://localhost:5000/api/consultas', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/consultas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

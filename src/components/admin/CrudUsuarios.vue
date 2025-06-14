@@ -28,7 +28,7 @@ const fetchUsers = async () => {
       error.value = 'No estás autenticado para ver los usuarios.'
       return
     }
-    const response = await fetch('http://localhost:5000/api/admin/usuarios', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/admin/usuarios', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -55,7 +55,7 @@ const deleteUser = async (id) => {
       error.value = 'No estás autenticado para eliminar usuarios.'
       return
     }
-    const response = await fetch(`http://localhost:5000/api/admin/usuarios/${id}`, {
+    const response = await fetch(`https://lab-dcw-back.onrender.com/api/admin/usuarios/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -79,7 +79,7 @@ const updateUser = async (usuario) => {
       error.value = 'No estás autenticado para actualizar usuarios.'
       return
     }
-    const response = await fetch(`http://localhost:5000/api/admin/usuarios/${usuario._id}`, {
+    const response = await fetch(`https://lab-dcw-back.onrender.com/api/admin/usuarios/${usuario._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

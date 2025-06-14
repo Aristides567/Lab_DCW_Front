@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api' // LOCAL, asegurado
+const API_URL = 'https://lab-dcw-back.onrender.com/api' // LOCAL, asegurado
 
 // 🟢 Login de usuario
 export async function login(email, password) {

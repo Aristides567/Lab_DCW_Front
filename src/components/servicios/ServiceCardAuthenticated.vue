@@ -5,7 +5,7 @@
   >
     <img
       v-if="service.imagen"
-      :src="'http://localhost:5000' + service.imagen"
+      :src="'https://lab-dcw-back.onrender.com' + service.imagen"
       :alt="service.nombre"
       class="mx-auto w-24 h-24 mb-4 object-cover rounded-full" />
     <h3 class="text-2xl mb-4 font-semibold text-violet-700">{{ service.nombre }}</h3>

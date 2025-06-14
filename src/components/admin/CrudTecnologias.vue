@@ -32,7 +32,7 @@ const totalPaginas = computed(() => Math.ceil(tecnologias.value.length / porPagi
 
 const fetchTechnologies = async () => {
   try {
-    const response = await fetch('http://localhost:5000/api/tecnologias')
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/tecnologias')
     if (!response.ok) throw new Error('Error al obtener tecnologías')
     const data = await response.json()
     tecnologias.value = data
@@ -63,8 +63,8 @@ const guardarTecnologia = async () => {
 
     const token = obtenerToken()
     const url = tecnologiaEditando.value
-      ? `http://localhost:5000/api/tecnologias/${tecnologiaEditando.value._id}`
-      : 'http://localhost:5000/api/tecnologias'
+      ? `https://lab-dcw-back.onrender.com/api/tecnologias/${tecnologiaEditando.value._id}`
+      : 'https://lab-dcw-back.onrender.com/api/tecnologias'
     const method = tecnologiaEditando.value ? 'PUT' : 'POST'
 
     const response = await fetch(url, {
@@ -98,7 +98,7 @@ const eliminarTecnologia = async (id) => {
   if (!confirm('¿Eliminar esta tecnología?')) return
   try {
     const token = obtenerToken()
-    const response = await fetch(`http://localhost:5000/api/tecnologias/${id}`, {
+    const response = await fetch(`https://lab-dcw-back.onrender.com/api/tecnologias/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     })

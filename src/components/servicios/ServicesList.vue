@@ -33,7 +33,7 @@ export default {
 
     const fetchServices = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/servicios')
+        const response = await fetch('https://lab-dcw-back.onrender.com/api/servicios')
         if (!response.ok) {
           throw new Error('Error en la respuesta del servidor')
         }

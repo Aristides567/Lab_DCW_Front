@@ -25,7 +25,7 @@ const fetchCartData = async () => {
       cartState.loading = false
       return
     }
-    const response = await fetch('http://localhost:5000/api/carrito', {
+    const response = await fetch('https://lab-dcw-back.onrender.com/api/carrito', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -50,7 +50,7 @@ const updateCartItem = async (servicioId, cantidad) => {
     if (!token) return
     
     const response = await fetch(
-      `http://localhost:5000/api/carrito/${servicioId}`,
+      `https://lab-dcw-back.onrender.com/api/carrito/${servicioId}`,
       {
         method: 'PUT',
         headers: {
@@ -72,7 +72,7 @@ const removeCartItem = async (servicioId) => {
     const token = obtenerToken()
     if (!token) return
     
-    const response = await fetch(`http://localhost:5000/api/carrito/${servicioId}`, {
+    const response = await fetch(`https://lab-dcw-back.onrender.com/api/carrito/${servicioId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
