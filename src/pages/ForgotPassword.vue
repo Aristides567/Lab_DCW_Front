@@ -15,7 +15,7 @@ const solicitarRestablecimiento = async () => {
   error.value = ''
 
   try {
-    const response = await fetch('http://localhost:5000/api/auth/forgotpassword', {
+    const response = await fetch('https://tilinazos.netlify.app/api/auth/forgotpassword', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
