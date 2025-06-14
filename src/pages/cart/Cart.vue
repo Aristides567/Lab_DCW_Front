@@ -1,136 +1,163 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { obtenerUsuario } from '@/utils/auth'
-import Header from '@/components/layout/Header.vue'
-import Footer from '@/components/layout/Footer.vue'
-import { cartState, fetchCartData, updateCartItem, removeCartItem } from '@/utils/cartStore'
 import { RouterLink, useRouter } from 'vue-router'
+import Header  from '@/components/layout/Header.vue'
+import Footer  from '@/components/layout/Footer.vue'
+import { obtenerUsuario } from '@/utils/auth'
+import {
+  cartState,
+  fetchCartData,
+  updateCartItem,
+  removeCartItem
+} from '@/utils/cartStore'
 
-const usuario = ref(null)
+/* ───────── estado ───────── */
+const usuario          = ref(null)
 const hoveredServiceId = ref(null)
+const router           = useRouter()
 
-const showTechnologiesHover = (serviceId) => {
-  hoveredServiceId.value = serviceId
-}
-const hideTechnologiesHover = () => {
-  hoveredServiceId.value = null
-}
+/* ───────── filtros ───────── */
+const validItems = computed(() =>
+  (cartState.items || []).filter(i => i?.servicioId)          // ← evita nulos
+)
 
-const actualizarCantidadEnCarrito = async (servicioId, nuevaCantidad) => {
-  if (nuevaCantidad <= 0) {
-    quitarDelCarrito(servicioId)
-    return
-  }
-  await updateCartItem(servicioId, nuevaCantidad)
-}
-const quitarDelCarrito = async (servicioId) => {
-  await removeCartItem(servicioId)
-}
-const confirmarEliminar = (servicioId) => {
-  if (confirm('¿Estás seguro de que quieres eliminar este servicio del carrito?')) {
-    quitarDelCarrito(servicioId)
-  }
-}
+/* ───────── totales ───────── */
+const subtotal   = computed(() =>
+  validItems.value.reduce((t, i) => t + (i.servicioId?.costo || 0) * i.cantidad, 0)
+)
+const impuestos  = computed(() => +(subtotal.value * 0.13).toFixed(2))
+const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
 
+/* ───────── helpers visuales ───────── */
+const showTechnologiesHover = id => (hoveredServiceId.value = id)
+const hideTechnologiesHover = () => (hoveredServiceId.value = null)
+const getImageUrl = p => (p ? `https://lab-dcw-back.onrender.com${p}` : '/placeholder.png')
+
+/* ───────── acciones carrito ───────── */
+async function actualizarCantidad (id, n) {
+  if (!id || n <= 0) return
+  await updateCartItem(id, n)
+}
+async function quitarDelCarrito (id) {
+  if (!id) return
+  await removeCartItem(id)
+}
+const confirmarEliminar = id =>
+  id && confirm('¿Eliminar este servicio del carrito?') && quitarDelCarrito(id)
+
+/* ───────── navegación ───────── */
+const irAlCheckout = () => router.push('/checkout')
+
+/* ───────── carga inicial ───────── */
 onMounted(() => {
   usuario.value = obtenerUsuario()
   fetchCartData()
 })
-
-const router = useRouter()
-const irAlCheckout = () => {
-  router.push('/checkout')
-}
-
-const getTechnologyImageUrl = (imagePath) => {
-  if (imagePath && !imagePath.startsWith('/uploads/technologies/')) {
-    return `https://lab-dcw-back.onrender.com/uploads/technologies/${imagePath.substring(imagePath.lastIndexOf('/') + 1)}`
-  }
-  return `https://lab-dcw-back.onrender.com/${imagePath}`
-}
-
-// Corrección del cálculo
-const subtotal = computed(() => cartState.total)
-const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
-const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
 </script>
 
 <template>
   <Header />
-  <section class="min-h-screen pt-24 p-8 bg-gray-50">
-    <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl font-bold text-violet-700 mb-6 flex items-center gap-2">
-        <span class="text-4xl">🛒</span> Tu Carrito
+
+  <section class="min-h-screen bg-gray-50 pt-24 p-8">
+    <div class="mx-auto max-w-6xl">
+      <h1 class="mb-6 flex items-center gap-2 text-3xl font-bold text-violet-700">
+        <span class="text-4xl">🛒</span> Tu&nbsp;Carrito
       </h1>
 
-      <div v-if="cartState.loading" class="flex justify-center items-center min-h-[400px]">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-600"></div>
+      <!-- loader / error -->
+      <div v-if="cartState.loading" class="flex min-h-[400px] items-center justify-center">
+        <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-violet-600"></div>
+      </div>
+      <div v-else-if="cartState.error" class="py-12 text-center">
+        <div class="mb-4 text-xl text-red-500">❌</div>
+        <p class="text-lg text-red-500">{{ cartState.error }}</p>
       </div>
 
-      <div v-else-if="cartState.error" class="text-center py-12">
-        <div class="text-red-500 text-xl mb-4">❌</div>
-        <p class="text-red-500 text-lg">{{ cartState.error }}</p>
+      <!-- vacío -->
+      <div v-else-if="!validItems.length" class="py-16 text-center">
+        <div class="mb-6 text-6xl">🛍️</div>
+        <h2 class="mb-4 text-2xl font-semibold text-gray-700">Tu carrito está vacío</h2>
+        <p class="mb-8 text-gray-500">¡Aún no has agregado ningún servicio!</p>
+        <RouterLink
+          to="/servicios"
+          class="inline-block rounded-lg bg-violet-600 px-6 py-3 font-semibold text-white transition-colors duration-300 hover:bg-violet-700"
+        >Explorar Servicios</RouterLink>
       </div>
 
-      <div v-else-if="!cartState.items || cartState.items.length === 0" class="text-center py-16">
-        <div class="text-6xl mb-6">🛍️</div>
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Tu carrito está vacío</h2>
-        <p class="text-gray-500 mb-8">¡Aún no has agregado ningún servicio a tu carrito!</p>
-        <RouterLink to="/servicios"
-          class="inline-block bg-violet-600 text-white px-6 py-3 rounded-lg hover:bg-violet-700 transition-colors duration-300 font-semibold">
-          Explorar Servicios
-        </RouterLink>
-      </div>
-
-      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Lista de Items -->
+      <!-- contenido -->
+      <div v-else class="grid gap-8 lg:grid-cols-3">
+        <!-- lista -->
         <div class="lg:col-span-2">
           <ul class="space-y-4">
-            <li v-for="item in cartState.items" :key="item.servicioId._id"
-              class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 relative"
-              @mouseover="showTechnologiesHover(item.servicioId._id)" @mouseleave="hideTechnologiesHover()">
-              <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-shrink-0">
-                  <img v-if="item.servicioId.imagen" :src="'https://lab-dcw-back.onrender.com' + item.servicioId.imagen"
-                    :alt="item.servicioId.nombre" class="w-32 h-32 object-cover rounded-lg border border-gray-200" />
-                </div>
-                <div class="flex-grow">
-                  <h3 class="font-bold text-xl text-violet-700 mb-2">{{ item.servicioId.nombre }}</h3>
-                  <p class="text-gray-600 mb-4">{{ item.servicioId.descripcion.substring(0, 100) + '...' }}</p>
+            <li
+              v-for="item in validItems"
+              :key="item.servicioId._id"
+              class="relative rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
+              @mouseover="showTechnologiesHover(item.servicioId._id)"
+              @mouseleave="hideTechnologiesHover"
+            >
+              <div class="flex flex-col gap-6 md:flex-row">
+                <!-- imagen -->
+                <img
+                  v-if="item.servicioId?.imagen"
+                  :src="getImageUrl(item.servicioId.imagen)"
+                  :alt="item.servicioId?.nombre"
+                  class="h-32 w-32 flex-shrink-0 rounded-lg border object-cover"
+                />
 
-                  <!-- Tecnologías Hover -->
+                <div class="flex-grow">
+                  <h3 class="mb-2 text-xl font-bold text-violet-700">{{ item.servicioId?.nombre }}</h3>
+                  <p class="mb-4 text-gray-600">
+                    {{ (item.servicioId?.descripcion || '').slice(0, 100) }}…
+                  </p>
+
+                  <!-- hover tecnologías -->
                   <div
-                    v-if="hoveredServiceId === item.servicioId._id && item.tecnologiasSeleccionadas && item.tecnologiasSeleccionadas.length"
-                    class="absolute top-0 left-0 p-4 bg-white rounded-lg shadow-lg border border-violet-200 z-10 w-64 animate-fade-in-scale transform -translate-x-full origin-top-right">
-                    <h4 class="text-sm font-semibold text-violet-700 mb-2">Tecnologías:</h4>
+                    v-if="hoveredServiceId === item.servicioId._id && item.tecnologiasSeleccionadas?.length"
+                    class="animate-fade-in-scale absolute left-0 top-0 w-64 -translate-x-full rounded-lg border border-violet-200 bg-white p-4 shadow-lg"
+                  >
+                    <h4 class="mb-2 text-sm font-semibold text-violet-700">Tecnologías:</h4>
                     <div class="flex flex-wrap gap-2">
-                      <img v-for="tech in item.tecnologiasSeleccionadas" :key="tech._id"
-                        :src="getTechnologyImageUrl(tech.image)" :alt="tech.name"
-                        class="h-10 w-10 object-cover rounded-full border border-gray-200" :title="tech.name" />
+                      <img
+                        v-for="tech in item.tecnologiasSeleccionadas"
+                        :key="tech._id"
+                        :src="getImageUrl(tech.image)"
+                        :alt="tech.name"
+                        class="h-10 w-10 rounded-full border object-cover"
+                        :title="tech.name"
+                      />
                     </div>
                   </div>
 
+                  <!-- cantidad / subtotal -->
                   <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                      <label for="cantidad" class="text-gray-600 font-medium">Cantidad:</label>
-                      <div class="flex items-center border rounded-lg overflow-hidden">
-                        <button @click="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad - 1)"
-                          class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors">-</button>
-                        <input type="number" v-model.number="item.cantidad"
-                          @change="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad)" min="1"
-                          class="w-16 p-2 text-center focus:outline-none" />
-                        <button @click="actualizarCantidadEnCarrito(item.servicioId._id, item.cantidad + 1)"
-                          class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors">+</button>
+                      <label class="font-medium text-gray-600">Cantidad:</label>
+                      <div class="overflow-hidden rounded-lg border">
+                        <button
+                          class="bg-gray-100 px-3 py-2 hover:bg-gray-200"
+                          @click="actualizarCantidad(item.servicioId._id, item.cantidad - 1)"
+                        >-</button>
+                        <input
+                          v-model.number="item.cantidad"
+                          @change="actualizarCantidad(item.servicioId._id, item.cantidad)"
+                          type="number" min="1"
+                          class="w-16 p-2 text-center focus:outline-none"
+                        />
+                        <button
+                          class="bg-gray-100 px-3 py-2 hover:bg-gray-200"
+                          @click="actualizarCantidad(item.servicioId._id, item.cantidad + 1)"
+                        >+</button>
                       </div>
                     </div>
                     <div class="text-right">
                       <p class="text-lg font-semibold text-violet-800">
-                        Subtotal: $ {{ item.precioTotal * item.cantidad }}
+                        Subtotal: $ {{ (item.servicioId?.costo || 0) * item.cantidad }}
                       </p>
-                      <button @click="confirmarEliminar(item.servicioId._id)"
-                        class="text-red-500 hover:text-red-700 text-sm font-medium mt-2 transition-colors">
-                        Eliminar
-                      </button>
+                      <button
+                        @click="confirmarEliminar(item.servicioId._id)"
+                        class="mt-2 text-sm font-medium text-red-500 transition-colors hover:text-red-700"
+                      >Eliminar</button>
                     </div>
                   </div>
                 </div>
@@ -139,33 +166,25 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
           </ul>
         </div>
 
-        <!-- Resumen -->
+        <!-- resumen -->
         <div class="lg:col-span-1">
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Resumen del Pedido</h2>
+          <div class="sticky top-24 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 class="mb-6 text-xl font-bold text-gray-800">Resumen del Pedido</h2>
 
-            <div class="space-y-4 mb-6">
-              <div class="flex justify-between text-gray-600">
-                <span>Subtotal</span>
-                <span>$ {{ subtotal }}</span>
-              </div>
-              <div class="flex justify-between text-gray-600">
-                <span>Impuestos (13%)</span>
-                <span>$ {{ impuestos }}</span>
-              </div>
-              <div class="border-t pt-4 flex justify-between text-lg font-bold text-violet-800">
-                <span>Total</span>
-                <span>$ {{ totalFinal }}</span>
+            <div class="mb-6 space-y-4">
+              <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>$ {{ subtotal }}</span></div>
+              <div class="flex justify-between text-gray-600"><span>Impuestos&nbsp;13 %</span><span>$ {{ impuestos }}</span></div>
+              <div class="border-t pt-4 text-lg font-bold text-violet-800">
+                <div class="flex justify-between"><span>Total</span><span>$ {{ totalFinal }}</span></div>
               </div>
             </div>
 
             <button
               @click="irAlCheckout"
-              class="w-full bg-violet-600 text-white py-3 rounded-lg hover:bg-violet-700 transition-colors duration-300 font-semibold mb-4">
-              Proceder al Pago
-            </button>
+              class="mb-4 w-full rounded-lg bg-violet-600 py-3 font-semibold text-white transition-colors duration-300 hover:bg-violet-700"
+            >Proceder al Pago</button>
 
-            <RouterLink to="/servicios" class="block text-center text-violet-600 hover:text-violet-700 font-medium">
+            <RouterLink to="/servicios" class="block text-center font-medium text-violet-600 hover:text-violet-700">
               Continuar Comprando
             </RouterLink>
           </div>
@@ -173,21 +192,14 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
       </div>
     </div>
   </section>
+
   <Footer />
 </template>
 
 <style scoped>
-.animate-fade-in-scale {
-  animation: fade-in-scale 0.2s ease-out;
-}
+.animate-fade-in-scale { animation: fade-in-scale 0.2s ease-out; }
 @keyframes fade-in-scale {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1);   }
 }
 </style>
