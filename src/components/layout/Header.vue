@@ -114,7 +114,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
               <div v-else-if="cartState.error" class="text-center py-4 text-red-500">Error al cargar resumen.</div>
 
               <ul v-else-if="cartState.items.length > 0" class="divide-y divide-gray-100 max-h-60 overflow-y-auto">
-                <li v-for="item in cartState.items" :key="item.servicioId._id"
+                <li v-for="item in cartState.items" v-if="item.servicioId" :key="item.servicioId._id"
                     class="px-4 py-3 flex justify-between items-start gap-3">
                   <div class="flex-1">
                     <p class="text-gray-800 font-medium text-sm leading-tight">{{ item.servicioId.nombre }}</p>
