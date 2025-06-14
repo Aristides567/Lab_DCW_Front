@@ -31,7 +31,7 @@ async function fetchOrders () {
 }
 
 /* ───────── imagen segura ───────── */
-const getImg = p => (p ? `https://lab-dcw-back.onrender.com/${p}` : '/placeholder.png')
+const getImg = p => (p ? `https://lab-dcw-back.onrender.com${p}` : '/placeholder.png')
 
 /* ───────── totales por si faltan ───────── */
 const ordersWithTotals = computed(() =>
