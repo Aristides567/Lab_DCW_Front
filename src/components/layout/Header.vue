@@ -11,7 +11,12 @@ const mostrarMenu = ref(false)
 const mostrarResumenCarrito = ref(false)
 let mouseLeaveTimeout = null
 
-const usuario = computed(() => obtenerUsuario())
+const usuario = ref(null)
+
+onMounted(() => {
+  usuario.value = obtenerUsuario()
+  fetchCartData()
+})
 
 const rutas = ['/', '/servicios', '/sobre-nosotros']
 
@@ -67,11 +72,6 @@ const handleMouseLeaveCart = () => {
   }, 200)
 }
 
-onMounted(() => {
-  fetchCartData()
-})
-
-// Cálculos
 const subtotal = computed(() => cartState.total)
 const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
 const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
@@ -114,7 +114,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
               <div v-else-if="cartState.error" class="text-center py-4 text-red-500">Error al cargar resumen.</div>
 
               <ul v-else-if="cartState.items.length > 0" class="divide-y divide-gray-100 max-h-60 overflow-y-auto">
-                <li v-for="item in cartState.items" :key="item.servicioId?._id || item.servicioId?.id" 
+                <li v-for="item in cartState.items" :key="item.servicioId._id"
                     class="px-4 py-3 flex justify-between items-start gap-3">
                   <div class="flex-1">
                     <p class="text-gray-800 font-medium text-sm leading-tight">{{ item.servicioId.nombre }}</p>
@@ -170,7 +170,7 @@ const totalFinal = computed(() => +(subtotal.value + impuestos.value).toFixed(2)
           </li>
           <li v-else class="relative">
             <button @click="toggleMenu" class="flex items-center gap-2 text-gray-800 hover:text-violet-600 transition">
-              <span class="font-semibold">{{ usuario.nombre }}</span>
+              <span class="font-semibold">{{ usuario?.nombre ?? 'Usuario' }}</span>
               <span class="text-xl">▼</span>
             </button>
 
