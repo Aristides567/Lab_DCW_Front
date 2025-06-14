@@ -144,7 +144,7 @@ onMounted(fetchTechnologies)
           </thead>
           <tbody class="bg-gray-800 divide-y divide-gray-700">
             <tr v-for="tech in tecnologiasPaginadas" :key="tech._id" class="hover:bg-violet-800 transition">
-              <td class="px-6 py-4"><img :src="`http://localhost:5000${tech.image}`" class="h-12 w-12 object-cover rounded" /></td>
+              <td class="px-6 py-4"><img :src="`https://lab-dcw-back.onrender.com${tech.image}`" class="h-12 w-12 object-cover rounded" /></td>
               <td class="px-6 py-4">{{ tech.name }}</td>
               <td class="px-6 py-4">{{ tech.description }}</td>
               <td class="px-6 py-4">${{ tech.price }}</td>

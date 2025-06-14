@@ -56,7 +56,7 @@ const subtotal = computed(() => cartState.total)
 const impuestos = computed(() => +(subtotal.value * 0.13).toFixed(2))
 const total = computed(() => +(subtotal.value + impuestos.value).toFixed(2))
 
-const getImageUrl = (path) => `https://lab-dcw-back.onrender.com/${path}`
+const getImageUrl = (path) => `https://lab-dcw-back.onrender.com${path}`
 
 const procesarCompra = async () => {
   if (!validarFechaExpiracion()) {

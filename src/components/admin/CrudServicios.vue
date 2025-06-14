@@ -10,7 +10,7 @@ const servicios = ref([])
 const cargando = ref(true)
 const error = ref('')
 const modoEdicion = ref(null)
-const imagenPreview = ref(null)
+const imagenPreview = ref(null) 
 const mostrarFormulario = ref(false)
 
 const nuevoServicio = ref({
