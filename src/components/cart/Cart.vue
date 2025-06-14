@@ -111,9 +111,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { obtenerUsuario } from '@/utils/auth'
-import BaseButton from '@/components/shared/BaseButton.vue'
-import Header from '@/components/layout/Header.vue'
-import Footer from '@/components/layout/Footer.vue'
 import { cartState, fetchCartData, updateCartItem, removeCartItem } from '@/utils/cartStore'
 import { RouterLink } from 'vue-router'
 
